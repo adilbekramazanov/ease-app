@@ -1,0 +1,657 @@
+/* ===========================================================================
+   ease — design system
+   Тёплая, спокойная, «премиальная клиника». Serif-дисплей (Fraunces) +
+   чистый Inter. Палитра: песок/крем фон, глубокий сливовый текст,
+   терракотовый акцент, ягодно-сливовый для глубины, шалфей для «спокойно».
+   =========================================================================== */
+:root {
+  /* поверхности */
+  --sand: #f6ede5;
+  --sand-2: #efe3d8;
+  --cream: #fffdfb;
+  --surface: #ffffff;
+
+  /* текст */
+  --ink: #2b1f2a;
+  --ink-2: #5d4f58;
+  --muted: #998b93;
+
+  /* линии */
+  --line: rgba(43, 31, 42, 0.1);
+  --line-strong: rgba(43, 31, 42, 0.16);
+
+  /* бренд */
+  --coral: #e07856;
+  --coral-deep: #c2583d;
+  --coral-soft: #f8e4da;
+  --plum: #875072;
+  --plum-deep: #5c3450;
+  --plum-soft: #f0e3ec;
+  --sage: #7f9d7b;
+  --amber: #e0a24f;
+
+  /* семантика шкалы симптомов */
+  --sev-low: #7f9d7b;
+  --sev-mid: #e0a24f;
+  --sev-high: #d06a4e;
+
+  --grad-brand: linear-gradient(135deg, #ec8a66 0%, #b85c7c 100%);
+  --grad-warm: linear-gradient(160deg, #faf2ec 0%, #f1e2d6 100%);
+  --grad-dusk: linear-gradient(160deg, #3a2a39 0%, #5c3450 60%, #8a4f5e 100%);
+
+  --radius-xl: 30px;
+  --radius-lg: 22px;
+  --radius-md: 16px;
+  --radius-pill: 999px;
+
+  --shadow-sm: 0 2px 8px -2px rgba(80, 40, 55, 0.12);
+  --shadow: 0 10px 30px -10px rgba(80, 40, 55, 0.22);
+  --shadow-lg: 0 30px 70px -24px rgba(70, 30, 50, 0.4);
+  --shadow-phone: 0 50px 110px -30px rgba(60, 24, 45, 0.5), 0 10px 30px -12px rgba(60, 24, 45, 0.3);
+
+  --serif: 'Fraunces', ui-serif, Georgia, 'Times New Roman', serif;
+  --sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+  --ease-soft: cubic-bezier(0.4, 0, 0.1, 1);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--sans);
+  color: var(--ink);
+  background: radial-gradient(130% 120% at 50% 0%, #f3e4da 0%, #ead9cd 45%, #e3cfc2 100%);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  min-height: 100vh;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  margin: 0;
+  font-family: var(--serif);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  line-height: 1.08;
+}
+
+p {
+  margin: 0;
+  line-height: 1.55;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* ── stage: центрируем «телефон» на тёплом фоне ─────────────────────────── */
+.stage {
+  min-height: 100vh;
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 28px 16px;
+  position: relative;
+}
+
+.stage-brand {
+  position: fixed;
+  top: 26px;
+  left: 30px;
+  font-family: var(--serif);
+  font-size: 22px;
+  letter-spacing: -0.02em;
+  color: #4a3542;
+  opacity: 0.6;
+  user-select: none;
+}
+.stage-brand b { font-weight: 600; }
+.stage-hint {
+  position: fixed;
+  bottom: 22px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  font-size: 12.5px;
+  color: #6b4f5e;
+  opacity: 0.55;
+}
+
+/* презентационный контрол «в начало» — живёт на сцене, вне телефона */
+.stage-restart {
+  position: fixed;
+  top: 26px;
+  right: 30px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px 10px 13px;
+  border: 1px solid rgba(74, 53, 66, 0.18);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: #4a3542;
+  font-family: var(--sans);
+  font-size: 13.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  box-shadow: 0 6px 18px -8px rgba(80, 40, 55, 0.3);
+  transition: transform 0.16s var(--ease-soft), background 0.2s, opacity 0.2s;
+  z-index: 100;
+}
+.stage-restart:hover { background: rgba(255, 255, 255, 0.85); transform: translateY(-1px); }
+.stage-restart:active { transform: scale(0.97); }
+.stage-restart:disabled { opacity: 0.4; cursor: default; box-shadow: none; }
+.stage-restart-ic { font-size: 16px; line-height: 1; }
+
+/* ── phone ──────────────────────────────────────────────────────────────── */
+.phone {
+  position: relative;
+  width: 390px;
+  max-width: 100%;
+  height: 844px;
+  max-height: calc(100dvh - 48px);
+  background: #241825;
+  border-radius: 54px;
+  padding: 11px;
+  box-shadow: var(--shadow-phone);
+}
+.phone::after {
+  /* боковые кнопки-намёк */
+  content: '';
+  position: absolute;
+  right: -2px;
+  top: 190px;
+  width: 3px;
+  height: 64px;
+  border-radius: 2px;
+  background: #1a111b;
+}
+
+.screen {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background: var(--cream);
+  border-radius: 44px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  isolation: isolate;
+}
+
+/* статус-бар */
+.statusbar {
+  flex: 0 0 auto;
+  height: 50px;
+  padding: 0 30px 0 34px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ink);
+  z-index: 5;
+}
+.statusbar.on-dark { color: #fff; }
+.statusbar .dynamic-island {
+  position: absolute;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 108px;
+  height: 30px;
+  background: #0e090f;
+  border-radius: 999px;
+}
+.statusbar-icons { display: flex; gap: 6px; align-items: center; font-size: 12px; }
+
+/* прокручиваемое тело экрана */
+.screen-body {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.screen-body::-webkit-scrollbar { display: none; }
+
+/* общий внутренний паддинг «страницы» */
+.pad {
+  padding: 8px 26px 26px;
+}
+
+/* фиксированная нижняя зона с кнопкой */
+.screen-foot {
+  flex: 0 0 auto;
+  padding: 14px 24px calc(24px + env(safe-area-inset-bottom));
+  background: linear-gradient(to top, var(--cream) 62%, rgba(255, 253, 251, 0));
+  z-index: 4;
+}
+
+/* ── типографика утилит ─────────────────────────────────────────────────── */
+.eyebrow {
+  font-family: var(--sans);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--coral-deep);
+}
+.display {
+  font-size: 34px;
+  line-height: 1.04;
+}
+.title {
+  font-size: 26px;
+  line-height: 1.1;
+}
+.lead {
+  font-size: 16.5px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+.tiny { font-size: 12.5px; color: var(--muted); }
+
+/* ── кнопки ─────────────────────────────────────────────────────────────── */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  width: 100%;
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 17px 24px;
+  font-size: 16.5px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  transition: transform 0.18s var(--ease-soft), box-shadow 0.25s var(--ease-soft),
+    opacity 0.2s;
+  position: relative;
+  overflow: hidden;
+}
+.btn:active { transform: scale(0.975); }
+.btn-primary {
+  background: var(--grad-brand);
+  color: #fff;
+  box-shadow: 0 12px 26px -10px rgba(190, 80, 90, 0.7);
+}
+.btn-primary:disabled {
+  background: #e7d8d0;
+  color: #b7a79f;
+  box-shadow: none;
+  cursor: not-allowed;
+}
+.btn-ghost {
+  background: transparent;
+  color: var(--ink-2);
+  box-shadow: none;
+  font-weight: 500;
+}
+.btn-dark {
+  background: var(--ink);
+  color: #fff;
+}
+.btn-lg { padding: 19px 24px; font-size: 17px; }
+
+/* ── прогресс квиза ─────────────────────────────────────────────────────── */
+.quiz-top {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 4px 24px 10px;
+}
+.iconbtn {
+  flex: 0 0 auto;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  font-size: 18px;
+  display: grid;
+  place-items: center;
+}
+.progress {
+  flex: 1 1 auto;
+  height: 7px;
+  border-radius: 999px;
+  background: var(--sand-2);
+  overflow: hidden;
+}
+.progress-fill {
+  height: 100%;
+  border-radius: 999px;
+  background: var(--grad-brand);
+  transition: width 0.5s var(--ease-soft);
+}
+.progress-count { flex: 0 0 auto; font-size: 13px; font-weight: 600; color: var(--muted); }
+
+/* ── варианты ответа ────────────────────────────────────────────────────── */
+.choices { display: flex; flex-direction: column; gap: 12px; }
+.choice {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  background: var(--surface);
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 17px 18px;
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--ink);
+  transition: border-color 0.18s, background 0.18s, transform 0.14s var(--ease-soft);
+}
+.choice:active { transform: scale(0.99); }
+.choice .emoji { font-size: 22px; line-height: 1; }
+.choice.selected {
+  border-color: var(--coral);
+  background: var(--coral-soft);
+}
+.choice .check {
+  margin-left: auto;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--line-strong);
+  flex: 0 0 auto;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  transition: background 0.18s, border-color 0.18s;
+}
+.choice.selected .check {
+  background: var(--coral);
+  border-color: var(--coral);
+}
+
+/* сегментированный / числовой ввод */
+.field {
+  width: 100%;
+  border: 1.5px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  font-size: 17px;
+  font-family: inherit;
+  color: var(--ink);
+  background: var(--surface);
+  outline: none;
+  transition: border-color 0.18s;
+}
+.field:focus { border-color: var(--coral); }
+.field::placeholder { color: var(--muted); }
+
+.seg { display: flex; background: var(--sand-2); border-radius: var(--radius-pill); padding: 4px; }
+.seg button {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 11px;
+  border-radius: var(--radius-pill);
+  font-weight: 600;
+  font-size: 14.5px;
+  color: var(--ink-2);
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+.seg button.on { background: var(--surface); color: var(--ink); box-shadow: var(--shadow-sm); }
+
+/* ── промо-слайд внутри квиза ───────────────────────────────────────────── */
+.promo {
+  border-radius: var(--radius-xl);
+  padding: 30px 26px;
+  color: #fff;
+  background: var(--grad-dusk);
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+}
+.promo .promo-emoji { font-size: 40px; }
+.promo h3 { color: #fff; font-size: 25px; margin-top: 16px; }
+.promo p { color: rgba(255, 255, 255, 0.82); margin-top: 12px; font-size: 15.5px; }
+.promo .stat { font-family: var(--serif); font-size: 46px; color: #fff; }
+
+/* ── карточка-пилюля статов ─────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 18px;
+}
+.row { display: flex; align-items: center; gap: 12px; }
+
+/* ── анимация анализа ───────────────────────────────────────────────────── */
+.analyze {
+  position: absolute;
+  inset: 0;
+  background: var(--grad-dusk);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  color: #fff;
+  text-align: center;
+}
+.orb {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  position: relative;
+  display: grid;
+  place-items: center;
+}
+.orb-ring {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  border: 2px solid rgba(255, 255, 255, 0.18);
+}
+.orb-core {
+  width: 118px;
+  height: 118px;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffd9c2, #ec8a66 55%, #b85c7c 100%);
+  box-shadow: 0 0 60px -6px rgba(255, 160, 140, 0.7);
+}
+.analyze-pct { font-family: var(--serif); font-size: 60px; margin-top: 30px; }
+.analyze-step { font-size: 16px; color: rgba(255, 255, 255, 0.85); margin-top: 8px; min-height: 24px; }
+
+/* ── шкала симптомов ────────────────────────────────────────────────────── */
+.gauge-wrap { position: relative; width: 240px; height: 240px; margin: 0 auto; }
+.gauge-num {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+.gauge-score { font-family: var(--serif); font-size: 68px; line-height: 1; color: var(--ink); }
+.gauge-of { font-size: 14px; color: var(--muted); margin-top: 2px; }
+.sev-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 7px 15px;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 14px;
+}
+.dot { width: 9px; height: 9px; border-radius: 50%; }
+
+.breakdown { display: flex; flex-direction: column; gap: 12px; }
+.bd-row { display: flex; flex-direction: column; gap: 7px; }
+.bd-head { display: flex; justify-content: space-between; font-size: 14px; }
+.bd-head b { font-weight: 600; }
+.bd-track { height: 9px; border-radius: 999px; background: var(--sand-2); overflow: hidden; }
+.bd-fill { height: 100%; border-radius: 999px; width: 0; transition: width 0.9s var(--ease-soft); }
+
+/* ── paywall ────────────────────────────────────────────────────────────── */
+.paywall-hero {
+  background: var(--grad-dusk);
+  color: #fff;
+  padding: 26px 26px 30px;
+  text-align: center;
+}
+.feature-row { display: flex; gap: 13px; align-items: flex-start; padding: 13px 0; }
+.feature-row .fi {
+  flex: 0 0 auto;
+  width: 42px; height: 42px;
+  border-radius: 13px;
+  background: var(--coral-soft);
+  display: grid; place-items: center;
+  font-size: 20px;
+}
+.feature-row h4 { font-family: var(--sans); font-weight: 600; font-size: 15.5px; }
+.feature-row p { font-size: 13.5px; color: var(--ink-2); margin-top: 2px; }
+
+.plan {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  text-align: left;
+  background: var(--surface);
+  border: 2px solid var(--line);
+  border-radius: var(--radius-lg);
+  padding: 16px 18px;
+  transition: border-color 0.18s, background 0.18s;
+}
+.plan.on { border-color: var(--coral); background: var(--coral-soft); }
+.plan-radio {
+  width: 22px; height: 22px; border-radius: 50%;
+  border: 2px solid var(--line-strong);
+  flex: 0 0 auto; display: grid; place-items: center;
+}
+.plan.on .plan-radio { border-color: var(--coral); }
+.plan.on .plan-radio::after { content: ''; width: 12px; height: 12px; border-radius: 50%; background: var(--coral); }
+.plan-main { flex: 1; }
+.plan-name { font-weight: 600; font-size: 15.5px; }
+.plan-sub { font-size: 13px; color: var(--muted); margin-top: 1px; }
+.plan-price { text-align: right; }
+.plan-price b { font-size: 16px; font-weight: 600; }
+.plan-price span { display: block; font-size: 12px; color: var(--muted); }
+.badge {
+  position: absolute;
+  top: -10px; right: 16px;
+  background: var(--ink);
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.credsrow { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; }
+.cred {
+  font-size: 11.5px;
+  color: var(--ink-2);
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 7px 12px;
+  font-weight: 500;
+}
+
+/* ── app home / SOS ─────────────────────────────────────────────────────── */
+.home {
+  flex: 1 1 auto;
+  min-height: 0;
+  background: radial-gradient(120% 90% at 50% 0%, #fff6f0, var(--cream));
+  display: flex; flex-direction: column;
+}
+.sos-btn {
+  width: 190px; height: 190px; border-radius: 50%;
+  border: none;
+  background: radial-gradient(circle at 38% 32%, #ffb199, #e0624a 60%, #b23b52);
+  color: #fff;
+  font-family: var(--serif);
+  font-size: 30px;
+  letter-spacing: 0.02em;
+  box-shadow: 0 24px 60px -16px rgba(200, 60, 70, 0.7);
+  display: grid; place-items: center;
+  position: relative;
+}
+.sos-btn small { display: block; font-family: var(--sans); font-size: 12.5px; font-weight: 500; opacity: 0.9; margin-top: 4px; letter-spacing: 0.08em; text-transform: uppercase; }
+.sos-halo { position: absolute; inset: -14px; border-radius: 50%; border: 2px solid rgba(224, 98, 74, 0.35); }
+
+/* ── breathing overlay (SOS) ───────────────────────────────────────────── */
+.breathe {
+  position: absolute; inset: 0;
+  background: var(--grad-dusk);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  color: #fff; text-align: center; padding: 40px;
+}
+.breathe-orb {
+  width: 150px; height: 150px; border-radius: 50%;
+  background: radial-gradient(circle at 36% 30%, #ffd9c2, #ec8a66 60%, #b85c7c);
+  box-shadow: 0 0 70px -6px rgba(255, 160, 140, 0.6);
+}
+.breathe-word { font-family: var(--serif); font-size: 30px; margin-top: 40px; min-height: 40px; }
+
+/* ── tab bar ────────────────────────────────────────────────────────────── */
+.tabbar {
+  flex: 0 0 auto;
+  display: flex;
+  justify-content: space-around;
+  padding: 12px 10px calc(16px + env(safe-area-inset-bottom));
+  border-top: 1px solid var(--line);
+  background: var(--cream);
+}
+.tab { display: flex; flex-direction: column; align-items: center; gap: 3px; background: none; border: none; color: var(--muted); font-size: 10.5px; font-weight: 500; }
+.tab .ti { font-size: 20px; }
+.tab.on { color: var(--coral-deep); }
+
+/* ── переходы между экранами ────────────────────────────────────────────── */
+.fade-step { animation: fadeStep 0.5s var(--ease-soft) both; }
+@keyframes fadeStep {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.stack { display: flex; flex-direction: column; }
+.gap-8 > * + * { margin-top: 8px; }
+.gap-12 > * + * { margin-top: 12px; }
+.gap-16 > * + * { margin-top: 16px; }
+.gap-20 > * + * { margin-top: 20px; }
+.gap-24 > * + * { margin-top: 24px; }
+.center { text-align: center; }
+.mt-auto { margin-top: auto; }
+
+@media (max-width: 440px) {
+  .stage { padding: 0; }
+  .phone {
+    width: 100%;
+    height: 100dvh;
+    max-height: none;
+    border-radius: 0;
+    padding: 0;
+    box-shadow: none;
+  }
+  .screen { border-radius: 0; }
+  .stage-brand, .stage-hint { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.001ms !important; transition-duration: 0.001ms !important; }
+}
