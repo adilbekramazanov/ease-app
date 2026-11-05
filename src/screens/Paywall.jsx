@@ -1,5 +1,6 @@
 import { useRef, useState } from 'react';
 import { StatusBar, Button } from '../components/Chrome';
+import Logo from '../components/Logo';
 import { useLenis } from '../lib/smoothScroll';
 
 const PLANS = [
@@ -9,7 +10,7 @@ const PLANS = [
 ];
 
 const FEATURES = [
-  ['🧘‍♀️', '15 minutes a day of CBT', 'Guided, clinically-backed sessions that calm hot flashes, sleep and mood.'],
+  ['🧘‍♀️', '10 minutes a day of CBT', 'Guided, clinically-backed sessions that calm hot flashes, sleep and mood.'],
   ['📈', 'Symptom tracking', 'Watch your Symptom Score improve week over week.'],
   ['🩺', 'Online clinic & HRT', 'Menopause-trained clinicians can prescribe HRT, with a plan to match.'],
   ['🥗', '12-week body plan', 'Meal plans, 3,000+ recipes, wall pilates, chair yoga & an AI calorie coach.'],
@@ -42,10 +43,13 @@ export default function Paywall({ onPurchase, onBack, goal }) {
       </button>
 
       <div className="screen-body" ref={bodyRef} style={{ marginTop: -50 }}>
-        <div className="paywall-hero" style={{ paddingTop: 64 }}>
+        <div className="paywall-hero" style={{ paddingTop: 58 }}>
+          <div className="center" style={{ marginBottom: 18 }}>
+            <Logo variant="horizontal-cream" height={26} className="paywall-logo" />
+          </div>
           <p className="eyebrow" style={{ color: '#f3c6b4' }}>Your plan is ready</p>
           <h1 className="display" style={{ color: '#fff', marginTop: 12 }}>
-            Menopause, eased in 15 minutes a day.
+            Menopause, eased in 10 minutes a day.
           </h1>
           <p style={{ color: 'rgba(255,255,255,0.82)', marginTop: 14, fontSize: 16, lineHeight: 1.5 }}>
             {goalLine(goal)} ease brings CBT, tracking and real clinical care into one calm place.

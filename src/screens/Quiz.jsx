@@ -2,20 +2,20 @@ import { useRef, useState } from 'react';
 import { QUIZ } from '../data/quiz';
 import { Button, StatusBar } from '../components/Chrome';
 
-export default function Quiz({ onComplete, onExit }) {
+export default function Quiz({ questions = QUIZ, onComplete, onExit }) {
   const [i, setI] = useState(0);
   const [answers, setAnswers] = useState({});
   const [unit, setUnit] = useState('kg');
   const [num, setNum] = useState('');
   const advancing = useRef(false);
 
-  const item = QUIZ[i];
-  const progress = ((i + 1) / QUIZ.length) * 100;
+  const item = questions[i];
+  const progress = ((i + 1) / questions.length) * 100;
 
   const goNext = (patch) => {
     const next = { ...answers, ...patch };
     setAnswers(next);
-    if (i + 1 >= QUIZ.length) {
+    if (i + 1 >= questions.length) {
       onComplete(next);
     } else {
       setI(i + 1);
@@ -48,7 +48,7 @@ export default function Quiz({ onComplete, onExit }) {
       <div className="quiz-top">
         <button className="iconbtn" onClick={back} aria-label="Back">‹</button>
         <div className="progress"><div className="progress-fill" style={{ width: `${progress}%` }} /></div>
-        <span className="progress-count">{i + 1}/{QUIZ.length}</span>
+        <span className="progress-count">{i + 1}/{questions.length}</span>
       </div>
 
       <div className="screen-body">

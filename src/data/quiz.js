@@ -29,7 +29,9 @@ export const DOMAINS = {
   sexual: 'Intimacy',
 };
 
-export const QUIZ = [
+// ── Фаза 1 — обнаружение проблем: демография + симптомы + промо.
+// Этого достаточно, чтобы посчитать Symptom Score (он берёт только type:'scale').
+export const QUIZ_PROBLEMS = [
   {
     id: 'age',
     type: 'single',
@@ -77,9 +79,9 @@ export const QUIZ = [
     id: 'promo-2',
     type: 'promo',
     emoji: '🧠',
-    stat: '15 min',
-    title: '15 minutes a day',
-    body: 'Guided CBT is clinically shown to ease the distress of hot flashes, sleep and low mood — in just 15 minutes a day.',
+    stat: '10 min',
+    title: '10 minutes a day',
+    body: 'Guided CBT is clinically shown to ease the distress of hot flashes, sleep and low mood — in just 10 minutes a day.',
   },
   scale('joints', 'physical', 'Joint aches or stiffness?', 'Especially in the morning or after sitting.'),
   scale('energy', 'physical', 'Fatigue or low energy?', 'Running on empty, even after rest.'),
@@ -93,6 +95,10 @@ export const QUIZ = [
     title: 'Evidence-based, and recognised',
     body: 'Apple Editors’ Choice · ORCHA-certified for NHS libraries · symptom tracking and HRT reviews by real users.',
   },
+];
+
+// ── Фаза 2 — личная информация (после показа Score): уточняем план.
+export const QUIZ_PERSONAL = [
   {
     id: 'weight',
     type: 'number',
@@ -129,6 +135,9 @@ export const QUIZ = [
     ],
   },
 ];
+
+// Полный список (обе фазы) — для расчёта Score и обратной совместимости.
+export const QUIZ = [...QUIZ_PROBLEMS, ...QUIZ_PERSONAL];
 
 // Индекс симптомных (оцениваемых) вопросов.
 export const SCORED_IDS = QUIZ.filter((q) => q.type === 'scale').map((q) => q.id);

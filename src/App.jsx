@@ -1,89 +1,34 @@
-import { useMemo, useState } from 'react';
-import QuizIntro from './screens/QuizIntro';
-import Quiz from './screens/Quiz';
-import Analyzing from './screens/Analyzing';
-import SymptomScore from './screens/SymptomScore';
-import Email from './screens/Email';
-import Paywall from './screens/Paywall';
-import Home from './screens/Home';
-import { computeScore } from './lib/score';
+import { useEffect, useState } from 'react';
+import Landing from './screens/Landing';
+import Funnel from './screens/Funnel';
 
-// Воронка ease (без лендинга):
-// intro → quiz → analyzing → score → email → paywall → home(SOS)
+// Простой роутинг по пути (без зависимостей):
+//   /        → лендинг (промо продукта)
+//   /funnel  → воронка-прототип в «телефоне»
+// На Vercel /funnel отдаёт index.html (rewrite в vercel.json); в dev — SPA-fallback Vite.
+const routeFromPath = () =>
+  window.location.pathname.replace(/\/+$/, '') === '/funnel' ? 'funnel' : 'landing';
+
 export default function App() {
-  const [step, setStep] = useState('intro');
-  const [answers, setAnswers] = useState({});
-  const [email, setEmail] = useState('');
+  const [route, setRoute] = useState(routeFromPath);
 
-  const score = useMemo(() => computeScore(answers), [answers]);
+  useEffect(() => {
+    const onPop = () => setRoute(routeFromPath());
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
 
-  // Сброс воронки в начало — управление для презентации (вне «телефона»).
-  const restart = () => {
-    setAnswers({});
-    setEmail('');
-    setStep('intro');
+  const navigate = (to) => {
+    const path = to === 'funnel' ? '/funnel' : '/';
+    const cur = window.location.pathname.replace(/\/+$/, '') || '/';
+    if (cur !== path) window.history.pushState({}, '', path);
+    setRoute(to);
+    window.scrollTo(0, 0);
   };
 
-  const screen = (() => {
-    switch (step) {
-      case 'intro':
-        return <QuizIntro onStart={() => setStep('quiz')} />;
-      case 'quiz':
-        return (
-          <Quiz
-            onExit={() => setStep('intro')}
-            onComplete={(a) => {
-              setAnswers(a);
-              setStep('analyzing');
-            }}
-          />
-        );
-      case 'analyzing':
-        return <Analyzing onDone={() => setStep('score')} />;
-      case 'score':
-        return <SymptomScore answers={answers} onContinue={() => setStep('email')} />;
-      case 'email':
-        return (
-          <Email
-            onBack={() => setStep('score')}
-            onSubmit={(e) => {
-              setEmail(e);
-              setStep('paywall');
-            }}
-          />
-        );
-      case 'paywall':
-        return (
-          <Paywall
-            goal={answers.goal}
-            onBack={() => setStep('email')}
-            onPurchase={() => setStep('home')}
-          />
-        );
-      case 'home':
-        return <Home score={score.overall} email={email} />;
-      default:
-        return null;
-    }
-  })();
-
-  return (
-    <div className="stage">
-      <div className="stage-brand"><b>ease</b></div>
-
-      {/* Презентационное управление — вне «телефона», не часть приложения */}
-      <button className="stage-restart" onClick={restart} disabled={step === 'intro'}>
-        <span className="stage-restart-ic" aria-hidden="true">↺</span>
-        Start over
-      </button>
-
-      <div className="phone">
-        {/* key=step → мягкий fade при каждой смене шага воронки */}
-        <div key={step} className="fade-step" style={{ height: '100%' }}>
-          {screen}
-        </div>
-      </div>
-      <div className="stage-hint">Prototype · click through the funnel</div>
-    </div>
+  return route === 'funnel' ? (
+    <Funnel onExitToLanding={() => navigate('landing')} />
+  ) : (
+    <Landing onStartFunnel={() => navigate('funnel')} />
   );
 }

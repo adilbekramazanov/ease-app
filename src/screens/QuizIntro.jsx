@@ -1,6 +1,6 @@
 import { StatusBar, Button } from '../components/Chrome';
 import SplitText from '../components/reactbits/SplitText';
-import GradientText from '../components/reactbits/GradientText';
+import Logo from '../components/Logo';
 
 export default function QuizIntro({ onStart }) {
   return (
@@ -8,16 +8,8 @@ export default function QuizIntro({ onStart }) {
       <StatusBar />
       <div className="screen-body">
         <div className="pad stack" style={{ height: '100%', paddingTop: 18 }}>
-          <div className="row" style={{ gap: 10 }}>
-            <GradientText
-              colors={['#ec8a66', '#b85c7c', '#ec8a66']}
-              animationSpeed={7}
-              className="wordmark"
-            >
-              <span style={{ fontFamily: 'var(--serif)', fontSize: 30, fontWeight: 600, letterSpacing: '-0.02em' }}>
-                ease
-              </span>
-            </GradientText>
+          <div className="row">
+            <Logo variant="horizontal-dark" height={32} />
           </div>
 
           <div style={{ marginTop: 34 }}>

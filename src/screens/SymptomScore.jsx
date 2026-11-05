@@ -7,7 +7,7 @@ import { computeScore, colorForPct, summaryFor } from '../lib/score';
 const R = 104;
 const CIRC = 2 * Math.PI * R;
 
-export default function SymptomScore({ answers, onContinue }) {
+export default function SymptomScore({ answers, onContinue, ctaLabel = 'Personalise my plan →' }) {
   const { overall, breakdown, band } = useMemo(() => computeScore(answers), [answers]);
   const numRef = useRef(null);
   const ringRef = useRef(null);
@@ -137,7 +137,7 @@ export default function SymptomScore({ answers, onContinue }) {
       </div>
 
       <div className="screen-foot">
-        <Button onClick={onContinue} className="btn-lg">See what helps →</Button>
+        <Button onClick={onContinue} className="btn-lg">{ctaLabel}</Button>
       </div>
     </div>
   );

@@ -24,7 +24,7 @@ export default function Email({ onSubmit, onBack }) {
           <h2 className="display" style={{ marginTop: 20 }}>Where should we send your plan?</h2>
           <p className="lead" style={{ marginTop: 12 }}>
             We’ll save your Symptom Score and email you a personalised menopause plan —
-            built around <b>15 minutes of CBT a day</b>.
+            built around <b>10 minutes of CBT a day</b>.
           </p>
 
           <div style={{ marginTop: 24 }}>
