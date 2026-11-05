@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import Logo from '../components/Logo';
-import { weeklyScores, DAY_LABELS, STREAK_DAY } from '../lib/progress';
+import { weeklyScores, DAY_LABELS, STREAK_DAY, moodOf } from '../lib/progress';
 import { bandOf, colorForPct } from '../lib/score';
 
 // Экран Track — трекинг симптомов за неделю (день 7). Контент внутри оболочки
 // Home (таб-бар рисует Home), поэтому обёртки .screen здесь нет.
-export default function Track({ score }) {
+export default function Track({ score, sessions = [] }) {
   const overall = score?.overall ?? 0;
   const breakdown = (score?.breakdown ?? []).filter((d) => d.pct > 0).slice(0, 4);
   const series = weeklyScores(overall);
@@ -84,6 +84,19 @@ export default function Track({ score }) {
         </svg>
       </div>
 
+      {/* залогированные сегодня CBT-сессии */}
+      {sessions.length > 0 && (
+        <div className="card" style={{ marginTop: 16 }}>
+          <div className="row" style={{ justifyContent: 'space-between', marginBottom: 12 }}>
+            <b style={{ fontSize: 15 }}>Today’s sessions</b>
+            <span className="tiny">{sessions.length} logged</span>
+          </div>
+          <div className="stack gap-12">
+            {sessions.map((s, idx) => <SessionLog key={s.ts || idx} s={s} />)}
+          </div>
+        </div>
+      )}
+
       {/* стрик */}
       <div className="streak" style={{ marginTop: 16 }}>
         <span className="streak-flame">🔥</span>
@@ -141,6 +154,28 @@ export default function Track({ score }) {
         {logged ? 'Logged ✓ · see you tomorrow' : 'Log today’s check-in'}
       </button>
       <div style={{ height: 8 }} />
+    </div>
+  );
+}
+
+// Одна залогированная CBT-сессия: настроение до→после + переосмысленная мысль.
+function SessionLog({ s }) {
+  const before = moodOf(s.moodBefore);
+  const after = moodOf(s.moodAfter);
+  const delta = (s.moodAfter ?? 0) - (s.moodBefore ?? 0);
+  const label = delta > 0 ? `Lifted ${delta} ${delta === 1 ? 'step' : 'steps'}` : delta < 0 ? 'Showed up' : 'Steady';
+  return (
+    <div className="sesslog">
+      <div className="sesslog-mood">
+        <span>{before?.e || '·'}</span>
+        <span className="sesslog-arrow">→</span>
+        <span>{after?.e || '·'}</span>
+      </div>
+      <div className="sesslog-body">
+        <b>{label}</b>
+        <p className="tiny">{s.reframe ? `“${s.reframe}”` : 'Session complete'}</p>
+      </div>
+      <span className="tiny sesslog-time">just now</span>
     </div>
   );
 }

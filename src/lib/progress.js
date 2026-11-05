@@ -3,6 +3,17 @@
 
 export const STREAK_DAY = 7;
 
+// Пятибалльная шкала настроения — общая для CBT-сессии и Track-лога.
+export const MOODS = [
+  { v: 1, e: '😣', l: 'Rough' },
+  { v: 2, e: '😕', l: 'Low' },
+  { v: 3, e: '😐', l: 'Meh' },
+  { v: 4, e: '🙂', l: 'Okay' },
+  { v: 5, e: '😊', l: 'Good' },
+];
+
+export const moodOf = (v) => MOODS.find((m) => m.v === v) || null;
+
 // Подписи дней недельного окна (день 7 = сегодня).
 export const DAY_LABELS = ['1', '2', '3', '4', '5', '6', '7'];
 

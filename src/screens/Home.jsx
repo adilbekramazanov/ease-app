@@ -20,15 +20,21 @@ export default function Home({ score, name, email }) {
   const overall = typeof score === 'object' && score ? score.overall ?? 0 : score ?? 0;
   const [tab, setTab] = useState('today');
   const [sos, setSos] = useState(false);
+  // Логи CBT-сессий, завершённых в приложении → показываются в Track.
+  const [sessions, setSessions] = useState([]);
 
-  // CBT-таб → полноэкранная сессия (без таб-бара), выход возвращает на Today.
+  // CBT-таб → полноэкранная сессия (без таб-бара). По завершении логируем в Track
+  // и мягко возвращаемся на главный экран.
   if (tab === 'cbt') {
     return (
       <CbtSession
         name={name}
         streakDay={STREAK_DAY}
         onExit={() => setTab('today')}
-        onComplete={() => setTab('today')}
+        onComplete={(log) => {
+          if (log) setSessions((s) => [{ ...log, ts: Date.now() }, ...s]);
+          setTab('today');
+        }}
       />
     );
   }
@@ -38,9 +44,18 @@ export default function Home({ score, name, email }) {
       <StatusBar />
       <div className="home">
         <div className="screen-body">
-          {tab === 'today' && <Today overall={overall} onStartCbt={() => setTab('cbt')} onSos={() => setSos(true)} />}
-          {tab === 'track' && <Track score={typeof score === 'object' ? score : { overall }} />}
-          {(tab === 'clinic' || tab === 'community') && <ComingSoon tab={tab} />}
+          <div key={tab} className="fade-step" style={{ minHeight: '100%' }}>
+            {tab === 'today' && (
+              <Today
+                overall={overall}
+                loggedToday={sessions.length > 0}
+                onStartCbt={() => setTab('cbt')}
+                onSos={() => setSos(true)}
+              />
+            )}
+            {tab === 'track' && <Track score={typeof score === 'object' ? score : { overall }} sessions={sessions} />}
+            {(tab === 'clinic' || tab === 'community') && <ComingSoon tab={tab} />}
+          </div>
         </div>
 
         <nav className="tabbar">
@@ -59,7 +74,7 @@ export default function Home({ score, name, email }) {
 }
 
 // ── Today ────────────────────────────────────────────────────────────────────
-function Today({ overall, onStartCbt, onSos }) {
+function Today({ overall, loggedToday, onStartCbt, onSos }) {
   const haloRef = useRef(null);
 
   useEffect(() => {
@@ -91,14 +106,25 @@ function Today({ overall, onStartCbt, onSos }) {
         </button>
       </div>
 
-      <button className="session-cta" onClick={onStartCbt}>
-        <span className="session-ic">🧘‍♀️</span>
-        <span className="session-main">
-          <b>Begin your day-{STREAK_DAY} session</b>
-          <span className="tiny">Notice · Reframe · Soothe — 10 min</span>
-        </span>
-        <span className="session-arrow">→</span>
-      </button>
+      {loggedToday ? (
+        <button className="session-cta logged" onClick={onStartCbt}>
+          <span className="session-ic">✓</span>
+          <span className="session-main">
+            <b>Today’s session logged to Track</b>
+            <span className="tiny">Nice work. Tap to do another round.</span>
+          </span>
+          <span className="session-arrow">→</span>
+        </button>
+      ) : (
+        <button className="session-cta" onClick={onStartCbt}>
+          <span className="session-ic">🧘‍♀️</span>
+          <span className="session-main">
+            <b>Begin your day-{STREAK_DAY} session</b>
+            <span className="tiny">Notice · Reframe · Soothe — 10 min</span>
+          </span>
+          <span className="session-arrow">→</span>
+        </button>
+      )}
 
       <div className="center" style={{ marginTop: 26 }}>
         <p className="tiny" style={{ marginBottom: 16 }}>Feeling a flash or a wave of anxiety?</p>

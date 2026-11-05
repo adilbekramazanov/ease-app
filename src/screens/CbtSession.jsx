@@ -1,19 +1,13 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { StatusBar, Button } from '../components/Chrome';
+import { MOODS } from '../lib/progress';
 
 // ── Главная фича ease: гид-сессия CBT на 15 минут ────────────────────────────
 // Поток: Settle → Notice (момент + мысль) → Reframe → Soothe (дыхание) → Close.
 // Это ядро продукта — реальная структура когнитивной работы, не заглушка.
 
-// Пятибалльная шкала настроения (до и после).
-const MOODS = [
-  { v: 1, e: '😣', l: 'Rough' },
-  { v: 2, e: '😕', l: 'Low' },
-  { v: 3, e: '😐', l: 'Meh' },
-  { v: 4, e: '🙂', l: 'Okay' },
-  { v: 5, e: '😊', l: 'Good' },
-];
+// Пятибалльная шкала настроения (MOODS) берётся из lib/progress — общая с Track.
 
 // Типовые менопаузальные «моменты» + заготовка автоматической мысли и
 // варианты сбалансированной переоценки под каждый.
@@ -103,6 +97,7 @@ export default function CbtSession({ name, onComplete, onExit, streakDay = 1 }) 
   const [traps, setTraps] = useState([]);
   const [reframe, setReframe] = useState('');
   const [moodAfter, setMoodAfter] = useState(null);
+  const [outro, setOutro] = useState(false);
 
   const step = STEPS[i];
   const moment = useMemo(() => MOMENTS.find((m) => m.id === momentId), [momentId]);
@@ -128,6 +123,17 @@ export default function CbtSession({ name, onComplete, onExit, streakDay = 1 }) 
     (step.key === 'reframe' && reframe.trim().length > 0) ||
     (step.key === 'close' && moodAfter != null) ||
     step.key === 'breath';
+
+  // Успокаивающий финал: анимированная цитата + стрик, затем мягко отдаём на главный экран.
+  if (outro) {
+    return (
+      <Outro
+        reframe={reframe}
+        streakDay={streakDay}
+        onDone={() => onComplete?.({ moodBefore, moodAfter, reframe, belief })}
+      />
+    );
+  }
 
   return (
     <div className="screen">
@@ -269,7 +275,7 @@ export default function CbtSession({ name, onComplete, onExit, streakDay = 1 }) 
       {step.key !== 'moment' && (
         <div className="screen-foot">
           {step.key === 'close' ? (
-            <Button className="btn-lg" disabled={!canContinue} onClick={onComplete}>
+            <Button className="btn-lg" disabled={!canContinue} onClick={() => setOutro(true)}>
               Finish session
             </Button>
           ) : step.key === 'breath' ? (
@@ -411,6 +417,62 @@ function MoodRow({ value, onPick }) {
           <span className="mood-l">{m.l}</span>
         </button>
       ))}
+    </div>
+  );
+}
+
+// ── Финальный успокаивающий экран: цитата + стрик, затем мягкое затухание ─────
+function Outro({ reframe, streakDay, onDone }) {
+  const rootRef = useRef(null);
+  const orbRef = useRef(null);
+  const quoteRef = useRef(null);
+  const streakRef = useRef(null);
+  const fired = useRef(false);
+
+  const finish = () => {
+    if (!fired.current) {
+      fired.current = true;
+      onDone?.();
+    }
+  };
+
+  useEffect(() => {
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
+    if (reduce) {
+      const t = setTimeout(finish, 1600);
+      return () => clearTimeout(t);
+    }
+
+    const ctx = gsap.context(() => {
+      gsap.to(orbRef.current, { scale: 1.14, duration: 3.4, ease: 'sine.inOut', yoyo: true, repeat: -1 });
+      gsap
+        .timeline()
+        .from(quoteRef.current, { opacity: 0, y: 16, duration: 1.0, ease: 'power2.out', delay: 0.3 })
+        .from(streakRef.current, { opacity: 0, y: 12, duration: 0.7, ease: 'power2.out' }, '-=0.15')
+        .to({}, { duration: 1.1 }) // держим пару секунд
+        .to(rootRef.current, { opacity: 0, duration: 0.65, ease: 'power1.inOut', onComplete: finish });
+    }, rootRef);
+
+    const safety = setTimeout(finish, 4600);
+    return () => {
+      ctx.revert();
+      clearTimeout(safety);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  return (
+    <div className="session-outro" ref={rootRef} onClick={finish}>
+      <div className="outro-orb" ref={orbRef} />
+      <p className="outro-eyebrow">Session complete</p>
+      <p className="outro-quote" ref={quoteRef}>
+        {reframe ? `“${reframe}”` : 'You showed up for yourself today.'}
+      </p>
+      <div className="outro-streak" ref={streakRef}>
+        <span>🔥</span>
+        {streakDay > 1 ? `Day ${streakDay} · ${streakDay}-day streak` : 'Day 1 · streak started'}
+      </div>
+      <p className="outro-hint">Breathe out. We’ll take you home.</p>
     </div>
   );
 }
