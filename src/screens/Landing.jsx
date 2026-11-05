@@ -20,7 +20,7 @@ export default function Landing({ onStartFunnel }) {
     <div className="lp">
       {/* шапка */}
       <header className="lp-nav">
-        <Logo variant="horizontal-dark" height={24} />
+        <Logo variant="horizontal-dark" height={38} />
         <nav className="lp-nav-right">
           <a href="/funnel" className="lp-link" onClick={go}>Take the 2-min quiz →</a>
           <button className="btn btn-primary lp-nav-cta" onClick={go}>Start</button>
@@ -135,6 +135,7 @@ export default function Landing({ onStartFunnel }) {
         <a href="/funnel" className="lp-link" onClick={go} style={{ marginTop: 10, display: 'inline-block' }}>
           Take the quiz →
         </a>
+        <p className="lp-creators">Created by Akniyet · Nursoltan · Adilbek</p>
       </footer>
     </div>
   );
